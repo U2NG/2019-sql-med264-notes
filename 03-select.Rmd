@@ -1,0 +1,156 @@
+---
+title: "The Select Statement"
+output: html_notebook
+---
+
+# Definition of SQL
+* SQL or Structured Query Language is an internatinal standard for manipulating data in a relational database. 
+
+* Each Relational Database system like Oracle, MySQL or SQLite implements its own variation of the standard.
+
+* Fortunateley for the types of commands and queries that we will want to write, all of the implementations are much in agreement. 
+
+* The relatively straightforward Select queries we will be writing to access data in our SQLite database will execute un-altered in many of the other environments.
+
+* Essentially you only have to learn SQL once.
+
+# SQL and Relational database tables
+* The strength of SQL is that a single SQL statement or query can request data be returned from one or many of the tables in the database. 
+
+* You can essentially define the relationships between tables on-the-fly as part of your query statement.
+
+# DDL and DML
+* `DDL` stands for `Data Definition Language`. 
+* It is the set of SQL comands used to create alter of delete database objects such as tables.
+* `DML` stands for `Data Manipulation Language`. 
+*Principally this is the `SELECT` command which is used to extract data items from one or more of the database tables.
+
+# Simple SQL queries useing the Select statement
+* For the rest of this episode we will be looking at the SELECT statement.
+
+* To follow along, you should open the DB Browser application and connect to the `SN7577` database.
+
+
+# The `SELECT` statement
+
+In SQL, querying data is performed by a `SELECT` statement. A select statement has 6 key components;
+
+```{r}
+library(DBI) #library added to run sql in notebook
+```
+
+
+```sql
+SELECT colnames
+FROM tablename
+GROUP BY colnames
+WHERE conditions
+HAVING conditions
+ORDER BY colnames
+```
+
+* In practice very few queries will have all of these clauses in them simplifying many queries. 
+* On the other hand, conditions in the `WHERE` clause can be very complex and if you need to `JOIN` two or more tables together then more clauses (JOIN and ON) are needed.
+* All of the clause names above have been written in uppercase for clarity. 
+SQL is not case sensitive. 
+* Neither do you need to write each clause on a new line, but it is often clearer to do so for all but the simplest of queries.
+* In this episode we will start with the very simple and work our way up to the more complex.
+* The simplest query is effectively one which returns the contents of the whole table
+
+```sql
+Select * 
+FROM SN7577;
+```
+* It is better practice and generally more efficient to explicitly list the column names that you want returned.
+
+```sql
+Select web1, web2, web3, web4
+From SN7577;
+```
+* The `*` character acts as a wildcard meaning all of the columns but you cannot use it as a general wildcard. So for example, the following is not valid.
+
+```sql
+Select w*
+From SN7577;
+```
+
+* If you run it you will get an error. When an error does occur you will see an error message displayed in the bottom pane.
+
+* In addition to limiting the columns returned by a query, you can also limit the rows returned. 
+* The simplest case is to say how many rows are wanted using the Limit clause. 
+* In this example, the first ten rows of the result of the query will be returned. 
+* This is useful if you just want to get a feel for what the data looks like.
+
+```sql
+Select *
+From SN7577
+Limit 10;
+```
+
+### Exercise
+Write a query which returns the first 5 rows from the SN7577 table with only the columns Q1,Q2,Q3,Q4 and numage.
+
+Solution:
+```sql
+ Select Q1, Q2, Q3, Q4, numage
+ From SN7577
+ Limit 5;
+```
+
+# The `WHERE` Clause
+
+* Usually you will want to restrict the rows returned based on some criteria. i.e. certain values or ranges within one or more columns.
+* In this example we are only interested in rows where the value in the Q1 column is 2
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 = 2;
+```
+
+* In addition to using the `=` we can use many other operators such as `<, <=, >, >=, <>`
+
+### Using more complex logical expressions in the `WHERE` clause
+
+* We can also use the `AND` and `OR` keywords to build more complex selection criteria.
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 > 5 and Q3 <> 2;
+```
+
+* You can ensure the precedence of the operators by using brackets. 
+* Note: Judicious use of brackets can also aid readability
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 = 5 or (Q3 <> 2 and Q4 > 8);
+```
+* The following query returns the rows where the value of Q1 either 5,6,7 or 8
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 > 5 and Q1 < 8;
+```
+
+* The same results could be obtained by using the `BETWEEN` or `IN` operators
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 Between 5 and 8;
+```
+* using `In`
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 In (5, 6, 7, 8);
+```
+* The list of values in brackets do not have to be contiguous or even in order.
+
+
+
+

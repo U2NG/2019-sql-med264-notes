@@ -1,0 +1,16 @@
+---
+title: "SQL for Social Science Setup"
+output: html_notebook
+---
+
+# SWC - SQL for Data Science Lesson Notes 
+
+### Setup
+* install DB Browser for SQLite
+* install SQLite Shell Program 
+* invoke SQLite Shell Program 
+* install SQLite ODBC connector
+
+
+
+
