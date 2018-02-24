@@ -1,0 +1,70 @@
+---
+title: "SQL Missing Data"
+output: html_notebook
+---
+
+## How does the database represents missing data
+
+*  A noted earlier, all database system have the concept of a `NULL` value; Something which is missing and nothing is known about it.
+
+* In DB Browser we can choose how we want `NULLs` in a table to be displayed. 
+
+* When we had our initial look at DB Browser, we used the `View | Preference` option to change the background colour of cells in a table which has a `NULL` values as red. 
+
+* The example below is a version of the SN7577 table with most of the columns removed and some NULL values introduced in the `numage` column.
+
+![image 1](images/SQL_04_Nulls_01.png)
+
+* If you type `=NULL` in the filter box for `numage`, only the rows with `NULL` in `numage` will be displayed.
+* You can get the same results using the following query:
+
+```sql
+SELECT * from 
+    SN7577_nulls
+WHERE numage is NULL;
+```
+* This table was created from a `csv` file which looks like this
+
+![image2](images/SQL_04_Nulls_02.png)
+
+* The line numbers on the left are from the text editor and are not part of the data.
+* You can see that in `lines 4, 9 and 15` there are consequetive `, ,`s where the numage values should be. These values are missing from the data.
+
+### Other representations of missing data
+
+* The `SN7577_nulls` table was specially created to demonstrate how NULLs appear in DB Browser. 
+* The proper `SN7577` table does not contain any missing values in the sense of having consequetive `,,`s. 
+
+* This is because the SN7577 data is provided by the `UKDS (UK Data Service)` whose role in part is to clean datasets before making them publicly available.
+
+* However the data provided to them, could well have missing data. 
+* In the case of the `SN7577` dataset this is typically dealt with by substituting the missing value with a value of `-1`.  
+
+* This is explained in the provided `data dictionary` for the `SN7577` dataset. 
+
+* An extract for `Q2` is shown below.
+
+![image](images/SQL_04_Nulls_03.png)
+
+* You can see from the extract of the `SN7577_nulls` file above that there are several `-1` values in the `Q2` field indicating the original data had no value, therefore interpreted as a `NULL` value for specific rows in `Q2`.
+
+* This is very different from rows which have a value of `11` for column `Q2` (3rd row from bottom). 
+
+* The `value 11` means that the participant `refused` to provide an answer. 
+* The refusal may not tell you which party they are inclined to vote for, but it does convey some kind of information. 
+* **A `NULL` value tells you nothing.**
+
+* Different statistical packages like `SPSS` or `Stata` have their own way of representing `NULL values` such as `-99` or `-999`. 
+* You need to be aware of how NULL values in your dataset are being represented.
+
+
+
+
+
+
+
+
+
+
+
+
