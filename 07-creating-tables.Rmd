@@ -1,0 +1,140 @@
+---
+title: "Creating tables and views"
+output: html_notebook
+---
+
+# Using SQL code to create tables
+
+* In relational databases, `tables` have to be created before you can add data to them.
+* The `table definition` that you create is referred to as the `Schema` of the table.
+
+* The `schema` can contain many different properties of the table, but in its simplest form you only need to specify a `name for the table` and a `list of the column names` and the `data types` for each of those columns.
+
+* we will create a couple of simple tables which we will use in a later lesson. 
+* We will also show how the SN7577 and SN7577_Text tables were created and populated from csv files.
+
+* Lets create a couple of simple tables first. 
+
+* The code creates a table called `Animals` with two columns
+
+* the first is called `Id_A` and is an `Integer` and the second is called `Name` and is of type `Text`.
+
+### Note:
+* As this table already exists in the database, it will fail if you try to run complaining that the table already exists. 
+* Instead of running it as-is, `change the table name` slightly (perhaps include your initials as a prefix).
+
+```sql
+CREATE TABLE Animals_ro
+(     Id_A Integer,
+      Name Text
+);
+```
+* When you run this in the DB Browser application, no results are returned, but you should see the table `Animals` in the left pane under tables and in the messages pane at the bottom there should be a message saying the query was successful.
+
+## Exericse:
+1. Make sure you ran the last code to create the Animals table:
+
+```sql
+CREATE TABLE Animals_ro
+(     Id_A Integer,
+      Name Text
+);
+```
+2. Create another table called `Animals_Eat` with two columns, `Id_E` which is an `integer` and `Eats` which is `text`.
+
+### Solution:
+1. The code is the same as above
+2. The code for the second table only requires slight modifications
+
+```sql
+CREATE TABLE Animals_Eat
+(   Id_E Integer,
+    Eats
+);
+
+```
+---
+
+* At this point we have two empty tables. The next step is to insert data into them.
+
+* To do this we can use the `INSERT INTO` command
+
+* The code below will insert seven rows into the Animals table.
+
+```sql
+INSERT INTO Animals (Id_A, Name)
+ VALUES   (1, "Elephant"),
+          (2, "Monkey"),
+          (3, "Cat"),
+          (4, "Dog"),
+          (8, "Goat"),
+          (10, "Pig"),
+          (11, "Mouse")
+
+```
+
+## Exercise:
+1. Add the following rows of data to the Animal_Eats table
+
+![image](images/SQL_07_Animals_eat_ex.png)
+
+### Solution:
+In this solution, the column list has been omitted. This is permissible if the values being inserted are in the same order as they have been defined in the table. In general though it is recommended that the column names are explicitly listed.
+
+```sql
+INSERT INTO Animals_Eat 
+ VALUES   (1, "Hay"),
+          (3, "Fish"),
+          (4, "Meat"),
+          (6, "Goldfish Food"),
+          (7, "Lettuse"),
+          (8, "Flowers"),
+          (10, "Anything")
+```
+
+* For small tables defining them and populating them with data in this way may be acceptable. 
+
+* But for larger tables this approach not only to defining the tables but adding potentially thousands of rows of data can be somewhat impractical.
+
+
+## Creating tables from other tables
+
+* Whenever you write a `Select` query and run it, the results are always in the form of a `table`. 
+
+* In the results pane, you can see the column names and the rows of data in the results.
+
+* This provides a very easy way of creating new table based on the results of a query.
+
+* The following query selects a few of the columns from the SN7577 table
+
+```sql
+SELECT Q1,
+       Q2,
+       Q3,
+       Sex,
+       Age,
+       Class
+FROM SN7577;
+
+```
+
+* If I want to make the results of this query into a new table, 
+* I can do so by simply prefixing the `Select` with `Create Table NewTablename AS` like this:
+
+```sql
+CREATE Table SN7577_reduced AS
+SELECT Q1,
+       Q2,
+       Q3,
+       Sex,
+       Age,
+       Class
+FROM SN7577;
+
+```
+
+
+
+
+
+
