@@ -151,6 +151,54 @@ Where Q1 In (5, 6, 7, 8);
 ```
 * The list of values in brackets do not have to be contiguous or even in order.
 
+## Exercise 1
+In the `SN7577` table the values of the web1, web2, web3, web4 columns are all -1, 0 or 1. The numage columns can be any value between 0 and 95. 
+
+Write a query which returns the web1, web2, web3, web4 and numage columns from the SN7577 table. The web1, web2, web3, web4 values should all be either 0 or 1 and the numage values should be between 30 and 40 inclusive. There are many ways of doing this, but try to use two different inequalities, an `IN` clause and a `BETWEEN` clause.
+
+### Solution:
+```sql
+select web1, web2, web3 ,  numage
+from sn7577
+where web1 >= 0 and web2 in (0, 1) and web3 <> -1 and numage between 30 and 40;
+```
+
+# Sorting resutls
+* If you want the results of your query to appear in a specific order, you can use the `ORDER BY` clause
+
+```sql
+Select Q1,  Q3, Q4
+From SN7577
+Where Q1 In (5, 6, 7, 8)
+Order By Q1;
+```
+* By default the SQL assumes Ascending order. You can make this more explicit by using the `ASC` or `DESC` keywords.
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 In (5, 6, 7, 8)
+Order By Q1 Desc;
+```
+* You can also order by multiple columns
+
+```sql
+Select  Q1,  Q3, Q4
+From SN7577
+Where Q1 In (5, 6, 7, 8)
+Order By Q1 Desc, Q3 Asc;
+```
+
+##### Key points
+* Strictly speaking SQL is a standard, not a particular implementation
+
+* SQL implementation are sufficiently close that you only have to learn SQL once
+
+* The DDL constructs are used to create tables and other database objects
+
+* The DML constructs, typically the `SELECT` statement is used to retrieve data from one or more tables
+
+* The `SELECT` statement allows you to `slice` and `dice` the columns and rows of the dataset so that the query only returns the data of interest
 
 
 
