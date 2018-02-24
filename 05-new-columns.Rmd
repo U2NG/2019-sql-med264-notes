@@ -135,3 +135,94 @@ FROM SN7577_Text;
 The result of the comparison is either the boolean value `True` or the boolean value `False`. 
 * SQLite represents the boolean values `True and False` as `1 and 0`. However as we want to return 0 if the expression is True we need to `NOT` the whole expression.
 
+
+## Exercise:
+Try running the query and check the results:
+
+```sql
+SELECT Q5axv,
+   NOT (substr(Q5axv, 1,2) = "no" ) as Q5axv_value
+FROM SN7577_Text;
+```
+
+Change the query to use the `instr function` and check that you get the same results.
+
+### Solution:
+```sql
+SELECT Q5axv,
+   NOT (instr(Q5axv, "no")) as Q5axv_value
+FROM SN7577_Text;
+```
+
+### Using SQL syntax to conditionally create new values
+
+* The SQLite SQL dialect has a progeramming construct called the `case` statement.
+
+* This is in fact common to many other programming languages as well. 
+
+* It can be used in two different ways, both of which can be used to create new columns in a queries’ result set.
+
+* First we will use the case statement to accomplish what we just did with the `substr` and `instr` functions.
+
+```sql
+SELECT Q5axv ,
+       case Q5axv
+            when "no null" then 0
+            when "null" then 1
+       end as Q5axv_bool 
+FROM SN7577_Text;
+
+```
+
+* This format of the `case` statement allows you to check if various values `are equal` to the value in the field given after the `case` keyword. 
+* There is a more general form which alows to to perform any kind of test.
+
+### Using SQL syntax to create `binned` values
+
+* It is often the case that we wish to convert a continous variable into a an discrete factor type variable. 
+* In SN7577 you can see this being done in the numage and the age variables.
+
+* We can use a `case` statement to create this type of effect. 
+
+* The example re-creates the age values used in the `SN7577_Text table` with the addition of an “Under age” category for those less than 18 years old.
+
+```sql
+SELECT numage ,
+               case 
+                   when numage between 18 and 24 then "18 - 24"
+                   when numage between 25 and 34 then "25 - 34"
+                   when numage between 35 and 44 then "35 - 44"
+                   when numage between 45 and 54 then "45 - 54"
+                   when numage between 55 and 59 then "55 - 59"
+                   when numage between 60 and 64 then "60 - 64"
+                   when numage          >= 65              then "65+"
+                else
+                    "Under age"
+               end as numage_range
+FROM SN7577;
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
