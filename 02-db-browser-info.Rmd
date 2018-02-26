@@ -11,6 +11,7 @@ output: html_notebook
 **show on screen**
 
 * start up window 
+
 #### Environment Overview 
 
 * A small `menu system` consisting of `File, Edit, View and Help`. 
@@ -53,6 +54,7 @@ Initially theese will be quite empty as we haven’t created or opened a databas
 
 * For this lesson we will be making extensive use of the SN7577 database. 
 * If you do not already have a copy of this database you can download it from here.
+
 #### Download data
 **https://data-lessons.github.io/sql-socialsci/data/SN7577.sqlite**
 
