@@ -56,7 +56,14 @@ Initially theese will be quite empty as we haven’t created or opened a databas
 * If you do not already have a copy of this database you can download it from here.
 
 #### Download data
-**https://data-lessons.github.io/sql-socialsci/data/SN7577.sqlite**
+[https://data-lessons.github.io/sql-socialsci/data/SN7577.sqlite](https://data-lessons.github.io/sql-socialsci/data/SN7577.sqlite)
+
+#### Database sn7577 info
+[https://discover.ukdataservice.ac.uk/#7577](https://discover.ukdataservice.ac.uk/#7577)
+* Title: Audit of Political Engagement 11, 2013 
+* Political behaviour and attitudes - Politics 
+
+
 
 To open the database in DB Browser do the following;
 
