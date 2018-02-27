@@ -13,3 +13,8 @@ SQL for Social Science Data lecture notes
 8. [07-creating-tables](07-creating-tables.nb.html)
 9. [08-commandline](08-commandline.nb.html)
 10. [09-joins](09-joins.nb.html)
+
+
+### Data Download
+1. [SN7577 data dictionary](https://github.com/U2NG/2018-sql-notes/blob/master/data/audit_of_political_engagement_11.tab)
+2. [SN7577 sqlite database](https://github.com/U2NG/2018-sql-notes/blob/master/data/SN7577.sqlite)
