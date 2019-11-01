@@ -1,16 +1,12 @@
 ---
-title: "SQL for Social Science Setup"
+title: "SQL for MED264 Setup"
 output: html_notebook
 ---
 
-# SWC - SQL for Data Science Lesson Notes 
+# SWC - SQL for MED264 Lesson Notes
 
 ### Setup
 * install DB Browser for SQLite
-* install SQLite Shell Program 
-* invoke SQLite Shell Program 
+* install SQLite Shell Program
+* invoke SQLite Shell Program
 * install SQLite ODBC connector
-
-
-
-
