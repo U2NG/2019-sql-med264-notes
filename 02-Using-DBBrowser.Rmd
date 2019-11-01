@@ -4,22 +4,21 @@ output: html_notebook
 ---
 
 # Launching DB Browser
-* The installation of DB Browser does not create a desktop icon. 
+* The installation of DB Browser does not create a desktop icon.
 * To explicitly launch the application after installing it, use the windows button (bottom left of screen) and type in `DB Browser` in the search bar and selecting the application when it appears.
 
 
-# The Initial Screen 
-* There is a small menu system consisting of File, Edit, View and Help. Below the the menu system is a toolbar with four options; New Database, Open Database, Write Changes and Revert Changes. Below the toolbar is a 4-tabbed pane for; Database Structure, Browse Data, Edit Proagmas and Execute SQL. 
+# The Initial Screen
+* There is a small menu system consisting of File, Edit, View and Help. Below the the menu system is a toolbar with four options; New Database, Open Database, Write Changes and Revert Changes. Below the toolbar is a 4-tabbed pane for; Database Structure, Browse Data, Edit Programs and Execute SQL.
 
-* Initially theese will be quite empty as we haven’t created ort opened a database yet. 
+* Initially these will be quite empty as we haven’t created ort opened a database yet.
 
 * In general we will see how each of these are used as we go through the lesson with the exception of the Edit Pragmas tab which deals with system wide parameters which we won’t want to change.
 
-* On the right hand side therte are two further panes, at the top is the Edit Database Cell pane which is al greyed out. Below it is a 3-tabbed pane for DB Schema, SQL log and Remote. 
+* On the right hand side there are two further panes, at the top is the Edit Database Cell pane which is al greyed out. Below it is a 3-tabbed pane for DB Schema, SQL log and Remote.
 
 * We are only really interested in the DB Schema tab.
 
 # Initial changes to the layout
-* The overall layout of DB Browser is quite flexible. 
+* The overall layout of DB Browser is quite flexible.
 * The panes on the righthand side can be dragged and dropped into any position, the individual tabs on the bottom pane closed directly from the pane and re-opened from the menu View item.
-
