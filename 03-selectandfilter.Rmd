@@ -1,0 +1,275 @@
+---
+title: "The Select Statement"
+output: html_notebook
+---
+
+# Definition of SQL
+* `SQL` or `Structured Query Language` is an international standard for manipulating data in a relational database.
+
+* Each Relational Database managers like Oracle, MySQL, SQLite, PostgreSQL implements its own variation of the standard.
+
+* Fortunately for the types of commands and queries that we will want to write, all of the implementations are much in agreement.
+
+* The relatively straightforward Select queries we will be writing to access data in our SQLite database will execute un-altered in many of the other environments.
+
+* Essentially you only have to learn SQL once.
+
+# SQL and Relational database tables
+* The strength of SQL is that a single SQL statement or query can request data be returned from one or many of the tables in the database.
+
+* You can essentially define the relationships between tables on-the-fly as part of your query statement.
+
+## Before we get into writing queries, let’s load the database and examine the database we will use in our examples:
+
+* To follow along, you should open the DB Browser application and connect to the `survey.db` database.
+
+* **load `survey.db`**
+  * click `open database`
+  * locate `survey.db` in desktop/sql-lesson folder
+
+**Run through each table in DB Browser**  
+http://swcarpentry.github.io/sql-novice-survey/01-select/index.html
+
+* Person: people who took readings
+* Site: locations where readings were taken
+* visited: when readings were taken at specific sites
+* Survey:  the actual readings. The field `quant` is short for quantitative and indicates what is being measured. Values are `rad, sal, and temp` referring to `‘radiation’, ‘salinity’ and ‘temperature’`, respectively.
+
+### Note:
+Notice that three entries — one in the `Visited table`, and two in the `Survey table` — don’t contain any actual data, but instead have a special `-null-` entry: we’ll return to these `missing values` later.
+
+# DDL and DML
+* `DDL` stands for `Data Definition Language`.
+* It is the set of `SQL commands` used to create alter of delete database objects such as tables.
+* `DML` stands for `Data Manipulation Language`.
+
+* Principally this is the `SELECT` command which is used to extract data items from one or more of the database tables.
+
+# Simple SQL queries using the Select statement
+* For the rest of this section of the lesson we will be looking at the `SELECT` statement.
+
+
+
+# The `SELECT` statement
+
+In SQL, querying data is performed by a `SELECT` statement. A `select statement` has 6 key components;
+
+```sql
+SELECT colnames
+FROM tablename
+GROUP BY colnames
+WHERE conditions
+HAVING conditions
+ORDER BY colnames
+```
+
+* In practice very few queries will have all of these clauses in them simplifying many queries.
+* On the other hand, conditions in the `WHERE` clause can be very complex and if you need to `JOIN` two or more tables together then more clauses (JOIN and ON) are needed.
+* All of the clause names above have been written in uppercase for clarity.
+SQL is not case sensitive.
+* Neither do you need to write each clause on a new line, but it is often clearer to do so for all but the simplest of queries.
+* In this episode we will start with the very simple and work our way up to the more complex.
+* The simplest query is effectively one which returns the contents of the whole table
+
+# Begin SELECT section
+For now, let’s write an SQL query that displays `scientists’` names. We do this using the SQL command `SELECT`, giving it the names of the columns we want and the table we want them from.
+
+Our query and its output look like this:
+
+```sql
+Select family, personal
+FROM Person;
+```
+* It is better practice and generally more efficient to explicitly list the `column names` that you want returned.
+
+
+* The `semicolon` at the end of the query tells the database manager that the query is complete and ready to run.
+
+* We have written our commands in upper case and the names for the table and columns in lower case, but we don’t have to: as the example below shows, SQL is case insensitive.
+
+```sql
+SeLeCt FaMiLy, PeRsOnAl
+FrOm PeRsOn;
+```
+* Whatever casing convention you choose, please be consistent: complex queries are hard enough to read without the extra cognitive load of random capitalization.
+
+* One convention is to use `UPPER CASE for SQL statements`, to distinguish them from tables and column names.
+* This is the convention that we will use.
+
+While we are on the topic of SQL’s syntax, one aspect of SQL’s syntax that can frustrate novices and experts alike is `forgetting to finish a command with ; (semicolon)`. In most Database managers, when you press enter for a command without adding the `;` to the end the query will not run or return an error.  
+* Make sure to check you have ended your query with a semicolon.
+
+Now, going back to our query, it’s important to understand that the rows and columns in a database table aren’t actually stored in any particular order.
+
+* They will always be displayed in some order, but we can control that in various ways.
+* For example, we could swap the columns in the output by writing our query as:
+
+```sql
+SELECT personal, family
+FROM Person;
+```
+
+* or even repeat columns:
+
+```sql
+SELECT id, id, id
+FROM Person;
+```
+* As a shortcut, we can select all of the columns in a table using `*`:
+
+```sql
+SELECT *
+FROM Person;
+```
+
+
+### Exercise 1
+Write a query that selects only the `name` column from the `Site` table.
+
+Solution:
+```sql
+SELECT name
+FROM Site;
+```
+
+### Limiting
+
+* The simplest case is to say how many rows are wanted using the `Limit` clause.
+
+* This is useful if you just want to get a feel for what the data looks like.
+
+```sql
+Select *
+From site
+Limit 10;
+```
+---
+
+
+
+# Filtering Data - The `WHERE` Clause
+
+* One of the most powerful features of a database is the ability to filter data, i.e., to select only those records that match certain criteria.
+
+* For example, suppose we want to see when a particular site was visited. We can select these records from the Visited table by using a WHERE clause in our query:
+
+```sql
+SELECT *
+FROM Visited
+WHERE site = 'DR-1';
+```
+The database manager executes this query in two stages.
+
+1. First, it checks at each row in the Visited table to see which ones satisfy the `WHERE`.
+
+2. It then uses the column names following the `SELECT` keyword to determine which columns to display.
+
+This processing order means that we can filter records using `WHERE` based on values in columns that aren’t then displayed:
+
+```sql
+SELECT id
+FROM Visited
+WHERE site = 'DR-1';
+```
+
+* Show figure [http://swcarpentry.github.io/sql-novice-survey/fig/sql-filter.svg]
+
+
+We can use many other Boolean operators to filter our data. For example, we can ask for all information from the DR-1 site collected before 1930:
+
+
+```sql
+SELECT *
+FROM Visited
+WHERE site = 'DR-1'
+AND dated < '1930-01-01';
+```
+
+If we want to find out what measurements were taken by either Lake or Roerich, we can combine the tests on their names using `OR`:
+
+```sql
+SELECT *
+FROM Survey
+WHERE person = 'lake' OR person = 'roe';
+```
+
+Alternatively, we can use `IN` to see if a value is in a specific set:
+
+```sql
+SELECT *
+FROM Survey
+WHERE person IN ('lake', 'roe');
+```
+We can combine `AND` with `OR`, but we need to be careful about which operator is executed first.
+
+If we don’t use parentheses, we get this:
+
+```sql
+SELECT *
+FROM Survey
+WHERE quant = 'sal' AND person = 'lake' OR person = 'roe';
+```
+which is salinity measurements by Lake, and any measurement by Roerich.
+
+We probably want this instead:
+
+```sql
+SELECT *
+FROM Survey
+WHERE quant = 'sal' AND (person = 'lake' OR person = 'roe');
+```
+
+We can also filter by partial matches.
+
+* For example, if we want to know something just about the site names beginning with “DR” we can use the LIKE keyword.
+
+The `percent symbol %` acts as a `wildcard`, matching any characters in that place.
+
+* It can be used at the beginning, middle, or end of the string:
+
+```sql
+SELECT *
+FROM Visited
+WHERE site
+LIKE 'DR%';
+```
+
+Finally, we can use `DISTINCT` with `WHERE` to give a second level of filtering:
+
+```sql
+SELECT DISTINCT person, quant
+FROM Survey
+WHERE person = 'lake' OR person = 'roe';
+```
+* But remember: `DISTINCT` is applied to the values displayed in the chosen columns, not to the entire rows as they are being processed.
+
+**Tip Growing Queries**  
+What we have just done is how most people `“grow”` their SQL queries. We started with something simple that did part of what we wanted, then added more clauses one by one, testing their effects as we went.
+
+* This is a good strategy — in fact, for complex queries it’s often the only strategy — but it depends on quick turnaround, and on us recognizing the right answer when we get it.
+
+The best way to achieve quick turnaround is often to put a subset of data in a temporary database and run our queries against that, or to fill a small database with synthesized records.
+* For example, instead of trying our queries against an actual database of 20 million Australians, we could run it against a sample of ten thousand, or write a small program to generate ten thousand random (but plausible) records and use that.
+
+
+
+
+
+##### Key points
+* Strictly speaking SQL is a standard, not a particular implementation
+
+* SQL implementation are sufficiently close that you only have to learn SQL once
+
+* The DDL constructs are used to create tables and other database objects
+
+* The DML constructs, typically the `SELECT` statement is used to retrieve data from one or more tables
+
+* The `SELECT` statement allows you to `slice` and `dice` the columns and rows of the dataset so that the query only returns the data of interest
+
+* Use `WHERE` to specify conditions that records must meet in order to be included in a query’s results.
+
+* Use `AND, OR, and NOT` to combine tests.
+
+* Filtering is done on whole records, so conditions can use fields that are not actually displayed.
+
+* Write queries incrementally.
