@@ -5,7 +5,8 @@ SQL for MED264 lecture notes
 
 1. [Setup](00-setup.nb.html)
 2. [01-relational-database](01-relational-database.html)
-3. [02-Using-DBBrowser](02-db-browser-info.html)
+3. [02-Using-DBBrowser](02-db-browser.html)
+      * [02-Using-DBBrowser-Info](02-db-browser-info.html)
 4. [03-select and filter](03-selectandfilter.html)
 5. [04-missing-data](04-missing-data.nb.html) - skip
 6. [05-new-columns](05-new-columns.nb.html) - skip

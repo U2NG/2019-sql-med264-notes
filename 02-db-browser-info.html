@@ -2,7 +2,7 @@
       <html>
         <head>
             <meta charset="utf-8" />
-            <title>index</title>
+            <title>02-db-browser-info</title>
             <style>.markdown-preview:not([data-use-github-style]) { padding: 2em; font-size: 1.2em; color: rgb(171, 178, 191); background-color: rgb(40, 44, 52); overflow: auto; }
 .markdown-preview:not([data-use-github-style]) > :first-child { margin-top: 0px; }
 .markdown-preview:not([data-use-github-style]) h1, .markdown-preview:not([data-use-github-style]) h2, .markdown-preview:not([data-use-github-style]) h3, .markdown-preview:not([data-use-github-style]) h4, .markdown-preview:not([data-use-github-style]) h5, .markdown-preview:not([data-use-github-style]) h6 { line-height: 1.2; margin-top: 1.5em; margin-bottom: 0.5em; color: rgb(255, 255, 255); }
@@ -582,26 +582,202 @@ pre.editor-colors .fold-marker:after {
 }
 </style>
         </head>
-        <body class='markdown-preview' data-use-github-style><h1 id="2019-sql-med264-notes">2019-sql-MED264-notes</h1>
-<p>SQL for MED264 lecture notes</p>
-<h3 id="lesson-notes">Lesson Notes:</h3>
-<ol>
-<li><a href="00-setup.nb.html">Setup</a></li>
-<li><a href="01-relational-database.html">01-relational-database</a></li>
-<li><a href="02-db-browser.html">02-Using-DBBrowser</a><ul>
-<li><a href="02-db-browser-info.html">02-Using-DBBrowser-Info</a></li>
+        <body class='markdown-preview' data-use-github-style><table>
+<thead>
+<tr>
+<th>title</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Using DB Browser for SQLite</td>
+<td>html_notebook</td>
+</tr>
+</tbody></table>
+<h3 id="launching-db-browser">Launching DB Browser</h3>
+<ul>
+<li>Windows - Use windows button (bottom left of screen), type in "DB Browser"</li>
+<li>Mac - Start DB Browser from applications folder</li>
 </ul>
+<h3 id="the-initial-screen">The Initial Screen</h3>
+<p><strong>show on screen</strong></p>
+<ul>
+<li>start up window</li>
+</ul>
+<h4 id="environment-overview">Environment Overview</h4>
+<ul>
+<li>A small <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">menu system</code> consisting of <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">File, Edit, View and Help</code>.</li>
+<li>Below the the menu system is a toolbar with four options; <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">New Database, Open Database, Write Changes and Revert Changes</code>.</li>
+</ul>
+<p>Below the toolbar is a 4-tabbed pane for; <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Database Structure, Browse Data, Edit Proagmas and Execute SQL</code>.
+Initially theese will be quite empty as we haven’t created or opened a database yet.</p>
+<ul>
+<li><p>In general we will see how each of these are used as we go through the lesson.</p>
 </li>
-<li><a href="03-selectandfilter.html">03-select and filter</a></li>
-<li><a href="04-missing-data.nb.html">04-missing-data</a> - skip</li>
-<li><a href="05-new-columns.nb.html">05-new-columns</a> - skip</li>
-<li><a href="06-aggregation.html">06-aggregation</a></li>
-<li><a href="07-creating-tables.nb.html">07-creating-tables</a> - skip</li>
-<li><a href="08-commandline.nb.html">08-commandline</a> - skip</li>
-<li><a href="09-joins.html">09-joins</a></li>
-</ol>
-<h3 id="data-download">Data Download</h3>
+<li><p>except of the Edit Pragmas tab which deals with system wide parameters which we won’t want to change.</p>
+</li>
+<li><p>On the right hand side therte are two further panes, at the top is the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Edit Database Cell</code> pane which is al greyed out.</p>
+</li>
+<li><p>Below it is a 3-tabbed pane for DB Schema, SQL log and Remote.</p>
+</li>
+<li><p>We are only really interested in the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DB Schema tab</code></p>
+</li>
+</ul>
+<h2 id="initial-change-to-the-layout">Initial change to the layout</h2>
+<ul>
+<li>Layout is quite flexible</li>
+<li>Drag and drop into positions</li>
+<li>individual tabs on the bottom pane closed directly from the pane and re-opened from the menu View item.</li>
+</ul>
+<h3 id="modify-panes-for-lessons">Modify panes for lessons</h3>
+<ul>
+<li>We will make a couple of initial changes to the layout of the screen.</li>
+<li>These will be retained across sessions.</li>
+</ul>
 <ol>
-<li><a href="http://swcarpentry.github.io/sql-novice-survey/files/survey.db">survey.db sqlite database</a></li>
-</ol></body>
+<li><p>From the View menu item un-select the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Edit Database Cell</code> icon to the left of the text. This will make the pane close and the bottom pane will be expanded automatically to fill the space.</p>
+</li>
+<li><p>From the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">View menu</code> item select <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">preferences</code> and select the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Data Browser</code> tab.</p>
+</li>
+</ol>
+<ul>
+<li><p>Towards the botton there is a section dealing with Field colors.</p>
+</li>
+<li><p>You will see three bars below the word Text, to the right there are in fact three invisible bars for the Background.</p>
+</li>
+<li><p>Click in the area for the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Backgroung color for NULL</code>.</p>
+</li>
+<li><p>A color selector window will open, select <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Red</code>.</p>
+</li>
+<li><p>The bar will turn Red.</p>
+</li>
+<li><p>This is now the default background cell colour that will be used to display <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULL</code> values in you tables.</p>
+</li>
+<li><p>We will discuss the meaning of <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULL</code> values in a table in a later.</p>
+</li>
+<li><p>close the preference window by clicking <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">OK</code>.</p>
+</li>
+</ul>
+<h2 id="opening-a-database">Opening a database</h2>
+<ul>
+<li>For this lesson we will be making extensive use of the SN7577 database.</li>
+<li>If you do not already have a copy of this database you can download it from here.</li>
+</ul>
+<p>To open the database in DB Browser do the following;</p>
+<ul>
+<li><p>clichk on the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">open database</code> button in the toolbar.</p>
+</li>
+<li><p>Navigate to where you have stored the database file on your local machine, select it and click open.</p>
+</li>
+<li><p>When you open the database, the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Database Structure</code> tab on the left andthe <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DB Schema</code> pane on the right will look very similar.</p>
+</li>
+<li><p>However the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DB Schema</code> pane is only there to allow you to see the details of the schema for the tables.</p>
+</li>
+<li><p>In particular what tables are in the database and the fields and their types which are in each table.</p>
+</li>
+<li><p>The <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Database Structure</code> tab on the left allows you to initiate actions on the tables.</p>
+</li>
+<li><p>If you right click on a table name in the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">DB Schema</code> pane, nothing happens.</p>
+</li>
+<li><p>However, if you do the same in the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Database Structure</code> menu you will be given a set of possible actions.</p>
+</li>
+<li><p>These are the same actions that are available from the toolbar at the top of the tab.</p>
+</li>
+<li><p>If you select <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Browse Table</code>, the data from the table is loaded into the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Browse Data</code> pane from where it can be examined or filtered.</p>
+</li>
+<li><p>You can also select ther table you wish to Browse directly from here.</p>
+</li>
+<li><p>There are options for <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">New Record</code> and <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Delete Record</code>.</p>
+</li>
+<li><p>It is unlikely that you will want to use these options.</p>
+</li>
+<li><p>Our interest is in analysing exiosting data not creating or deleting data.</p>
+</li>
+</ul>
+<h2 id="running-sql-queries">Running SQL Queries</h2>
+<ul>
+<li><p>We will be running queries extensively in future episodes.</p>
+</li>
+<li><p>For now we will just provide an outline of the environment.</p>
+</li>
+<li><p>In the left hand pane if you select the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Execute SQL</code> tab, you will be presented with a three paned window and a small toolbar.</p>
+</li>
+<li><p>The top pane is itself tabbed with the initial tab labeled <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">SQL 1</code>.</p>
+</li>
+<li><p>This is the SQL editor pane into which you will type your queries.</p>
+</li>
+</ul>
+<p>On the toolbar there are five buttons. Left to right they are:</p>
+<ul>
+<li>Open Tab (creates a new tab in the editor)</li>
+<li>Open SQL file (allows you to load a prepared file of SQL into the editor - the tab     takes the name of he file)</li>
+<li>Save SQL file (allows you to save the current contents of the active pane to the      local file system)</li>
+<li>Execute SQL (Executes all of the SQL statements in the editor pane)</li>
+<li>Execute current line (Actually executes whatever is selected)</li>
+</ul>
+<ul>
+<li><p>Because it is possible to have and execute multiple SQL statements in the same editor pane, each must be terminated with a <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">;</code>.</p>
+</li>
+<li><p>If you only have a single statement you don’t need it, but it might be considered best practice to always include it.</p>
+</li>
+<li><p>The pane below the editor is the Results pane.</p>
+</li>
+<li><p>The results of running your query will appear here in a simple tabular format.</p>
+</li>
+<li><p>The bottom pane is for messages about the execution, either an error message or an indication of how many rows were returned by the query.</p>
+</li>
+<li><p>Below is a simple examople query and the results.</p>
+</li>
+</ul>
+<p><img alt="image" src="/Users/rotsuji/Documents/git_repos/2019-sql-med264-notes/images/DB_Browser_run_4.png"></p>
+<ul>
+<li><p>Notice that the queryhas been written over multiple lines.</p>
+</li>
+<li><p>This is commonly done to aid readability.</p>
+</li>
+<li><p>The second pane has the tabular results, and the bottom pane has a message indicating how many rows were returned, how long it took and a copy of the SQL statement that was executed.</p>
+</li>
+<li><p>To the right of the bottom pane is a single button which will provideyou with options about what you can do with the output.</p>
+</li>
+<li><p>This includes saving it to a <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">csv</code> file.</p>
+</li>
+</ul>
+<h3 id="creating-a-database">Creating a database</h3>
+<ul>
+<li><p>As well as opening (connecting) to existing databases it is also possible to create new SQLite databases and tables using DB Browser.</p>
+</li>
+<li><p>To create a database click the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">New Database</code> button from the main toolbar (also available from the File menu).</p>
+</li>
+<li><p>You will initially be asked for a name for the database and where you want to save it. It is saved as a single file.</p>
+</li>
+<li><p>You can choose your own extension but <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">sqlite</code> is recommended.</p>
+</li>
+<li><p>If you do not provide a default, then a <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">.db</code> extension will be used.</p>
+</li>
+<li><p>Although the new database is empty, in that there are no tables in it, the .sqlite file itself is not empty.</p>
+</li>
+<li><p>Once you have saved the databae file the <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Create Table wizard</code> will open allowing you to create a table.</p>
+</li>
+<li><p>You can cancel this as we will be going through the create table process in a later episode.</p>
+</li>
+</ul>
+<h3 id="write-changes--revert-changes">Write Changes &amp; Revert Changes</h3>
+<ul>
+<li>During your DB Browser session, if you create or delete any tables the changes are not automatically written to the database file.</li>
+<li>When you try to end the session (i.e. close the application) you will be asked if you want to save the changes you have made.</li>
+<li>Alternatively you can explicitly save changes or revert changes during a session by use of the Write Changes and Revert Changes buttons on the toolbar.</li>
+<li>Once written the changes are permanent (there is no concept of multiple <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">undo</code> like you might have in other programs).</li>
+<li>Revert Changes will take you back to the last Written copy.</li>
+</ul>
+<h3 id="key-points">Key Points</h3>
+<ul>
+<li><p>The DB Browser for SQLite application allows you to connect to an existing database or create a new database</p>
+</li>
+<li><p>When connected to a database you can create new tables</p>
+</li>
+<li><p>When connected to a database you can write and run SQL queries and view the results</p>
+</li>
+<li><p>You can save the reults of a query to a file</p>
+</li>
+</ul></body>
       </html>
