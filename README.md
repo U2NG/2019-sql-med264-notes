@@ -1,4 +1,3 @@
-# 2018-sql-notes
-SQL for Social Science Data lecture notes
-Notes from https://data-lessons.github.io/sql-socialsci/
-
+# 2019-sql-notes
+SQL for MED264 lecture notes
+Notes from http://swcarpentry.github.io/sql-novice-survey/
