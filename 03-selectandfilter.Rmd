@@ -249,6 +249,7 @@ What we have just done is how most people `“grow”` their SQL queries. We sta
 * This is a good strategy — in fact, for complex queries it’s often the only strategy — but it depends on quick turnaround, and on us recognizing the right answer when we get it.
 
 The best way to achieve quick turnaround is often to put a subset of data in a temporary database and run our queries against that, or to fill a small database with synthesized records.
+
 * For example, instead of trying our queries against an actual database of 20 million Australians, we could run it against a sample of ten thousand, or write a small program to generate ten thousand random (but plausible) records and use that.
 
 

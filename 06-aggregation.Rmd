@@ -1,140 +1,208 @@
 ---
-title: "Aggregations"
+title: "aggregations"
 output: html_notebook
 ---
 
+### Aggregation Overview:
+**Questions**    
+* How can I calculate sums, averages, and other summary values?
+
+**Objectives**  
+* Define aggregation and give examples of its use.
+
+* Write queries that compute aggregated values.
+
+* Trace the execution of a query that performs aggregation.
+
+* Explain how missing data is handled during aggregation.
 
 # Using built-in statistical functions
 
-* Aggregate functions are used perform some kind of mathematical or statistical calculation across a group of rows. 
-* The rows in each group are determined by the different values in a specified column or columns. 
+* Aggregate functions are used perform some kind of mathematical or statistical calculation across a group of rows.
+
+* The rows in each group are determined by the different values in a specified column or columns.
 * Alternatively you can aggregate across the entire table.
 
 
-* If we wanted to know the `minimum`, `average` and `maximum age` values `(numage)` across the whole SN7577 table we could write a query such as this:
+
+
+**We now want to calculate ranges and averages for our data.
+We know how to select all of the dates from the Visited table:**
 
 ```sql
-SELECT 
-    min(numage),
-    avg(numage),
-    max(numage)
-FROM SN7577;
-
+SELECT dated
+FROM Visited;
 ```
 
-* This sort of query provides us with a general view of the values for a particular column or field across the whole table.
-
-* `min` , `max` and `avg` are builtin aggregate functions in SQLite (and any other SQL database system). 
-* There are other such functions avaialable. 
-https://sqlite.org/lang_aggfunc.html
-
-* It is more likely that we would want to find such values for a range, or multiple ranges of rows where each range is determined by the values of some other column in the table. 
-* Before we do this we will look at how we can find out what different values are contained in a given column.
-
-## The `Distinct` keyword
-
-* For the SN7577 table the allowable values in many of the columns are listed in the SN7577 document. 
-* But this doesn’t mean that they all actually appear in the data.
-
-* To obtain a list of umique values in a particular column you can use the `Distinct` keyword. 
-* We will use the text version of the SN7577 table for these examples.
-
-* For Q1 `How would you vote if there were a General Election tomorrow?` there are 11 possibilities listed and another (-1) for a missing value.
-
-To find out which values are in the data we can use the query:
+to combine them, we must use an aggregation function such as `min or max`.
+* Each of these functions takes a set of records as input, and produces a single record as output:
 
 ```sql
-SELECT DISTINCT Q1
-FROM SN7577_Text;
+SELECT min(dated)
+FROM Visited;
 ```
+Show Image [http://swcarpentry.github.io/sql-novice-survey/fig/sql-aggregation.svg]
 
-* We can see from the reults of running this that all 11 values are represented and that there is no missing data in this field.
-
-* You can have more than one column name after the `Distinct` keyword. 
-* the results will include a row for each unique combination of the columns involved
-
-## Exercise 
-Q3 asks for the likelihood of voting on a scale of 1 - 10 (10 - Absolutely certain to vote). Write a query which shows all of the combinations of voting intentions (Q1) and likelihood of voting (Q3).
-
-### Solution:
-Sorting the results by Q1 gives the political parties in alphabetical order.
-```sql
-SELECT DISTINCT Q1, Q3
-FROM SN7577_Text
-ORDER BY Q1
-
-```
-
-## The `group by` clause to summarise data
-
-* Just knowing the combinations is of limited use. You really want to know `How many` of each of the values there are. 
-* To do this we use the `Group By` clause.
+* Alternatively...
 
 ```sql
-SELECT Q1,
-       count(*) as Num_potential_voters
-FROM SN7577_Text
-GROUP BY Q1
-ORDER BY Q1;
+SELECT max(dated)
+FROM Visited;
+```
+* `min` and `max` are just two of the aggregation functions built into SQL.
+* Three others are `avg, count`, and `sum`:
 
+
+**avg(reading)**
+```sql
+SELECT avg(reading)
+FROM Survey
+WHERE quant = 'sal';
+```
+**count(reading)**
+```sql
+SELECT count(reading)
+FROM Survey
+WHERE quant = 'sal';
 ```
 
-* This query gives us a count of potential voters for each party.
+**sum(reading)**
+```sql
+SELECT sum(reading)
+FROM Survey
+WHERE quant = 'sal';
+```
+We used `count(reading)` here, but we could just as easily have counted quant or any other field in the table, or even used count() , since the function doesn’t care about the values themselves, just how many values there are.
 
-* three aggregation were performed over the single column Q1. 
-* It is possible to aggregate over multiple columns by specifying them in both the select and the group by clause.
+SQL lets us do several aggregations at once.
 
-* The grouping will take place based on the order of the columns listed in the group by clause.
+We can, for example, find the range of sensible salinity measurements:
 
-* What is not allowed is specifying a non-aggregated column in the select clause which is not mentioned in the group by clause.
-
-## Using the `having` clause
-
-* In order to filter the rows returned in a non-aggregated query we used the `where` clause. 
-
-* For an aggregated query the equivalent is the `having` clause.
-* You use the `having` clause by providing it with a filter expression which references one of the aggregated columns.
-
-* In a `having` clause you can use the column alias to refer to the aggregated column.
 
 ```sql
-SELECT Q1 ,
-       sum(daily3) as Telegraph_reader
-FROM SN7577 
-GROUP BY Q1
-HAVING Telegraph_reader > 5;
-
+SELECT min(reading), max(reading)
+FROM Survey
+WHERE quant = 'sal' AND reading <= 1.0;
 ```
 
-* In this example aggregating `Telegraph readers` by voter intentions `(Q1)`.
+* We can also combine aggregated results with raw results, although the output might surprise you:
 
-* We are only interested in the groups where there are more than 5 ‘Telegraph’ readers.
 
-## Exercise 
-In the UK the ‘Telegraph’ is regarded as a right-wing newspaper and the Conservatives are considered to be a right-wing political party.
-
-Do the results of the query above support this?
-
-The ‘Mirror’ is a left-wing newspaper and Labour are considered to be a left-wing political party. Re-write the query above to see which group of supporters are more likely to read the Mirror
-
-You can browse the Newspapers table to find out which of the daily columns refers to the Mirror
-
-### Solution:
 ```sql
-SELECT Q1 ,
-       sum(daily12) as Mirror_reader
-FROM SN7577 
-GROUP BY Q1
-HAVING Mirror_reader > 5;
+SELECT person, count(*)
+FROM Survey
+WHERE quant = 'sal' AND reading <= 1.0;
+```
+
+Why does Lake’s name appear rather than Roerich’s or Dyer’s?
+* The answer is that when it has to aggregate a field, but isn’t told how to, the database manager chooses an actual value from the input set.
+* It might use the first one processed, the last one, or something else entirely.
+
+Another important fact is that when there are no values to aggregate — for example, where there are no rows satisfying the `WHERE clause` — aggregation’s result is ``“don’t know”`` rather than zero or some other arbitrary value:
+
+
+```sql
+SELECT person, max(reading), sum(reading)
+FROM Survey
+WHERE quant = 'missing';
+```
+One final important feature of aggregation functions is that they are inconsistent with the rest of SQL in a very useful way.
+* If we add two values, and one of them is null, the result is null.
+* By extension, if we use sum to add all the values in a set, and any of those values are null, the result should also be null.
+
+* It’s much more useful, though, for aggregation functions to ignore null values and only combine those that are non-null.
+
+This behavior lets us write our queries as:
+
+```sql
+SELECT min(dated)
+FROM Visited;
+```
+
+instead of always having to filter explicitly:
+
+```sql
+SELECT min(dated)
+FROM Visited
+WHERE dated IS NOT NULL;
+```
+Aggregating all records at once doesn’t always make sense.
+* For example, suppose we suspect that there is a systematic bias in our data, and that some scientists’ radiation readings are higher than others.
+* We know that this doesn’t work:
+
+```sql
+SELECT person, count(reading), round(avg(reading), 2)
+FROM  Survey
+WHERE quant = 'rad';
+```
+
+because the database manager selects a single arbitrary scientist’s name rather than aggregating separately for each scientist.
+
+* Since there are only five scientists, we could write five queries of the form:
+
+```sql
+SELECT person, count(reading), round(avg(reading), 2)
+FROM  Survey
+WHERE quant = 'rad'
+AND   person = 'dyer';
+```
+
+but this would be tedious, and if we ever had a data set with fifty or five hundred scientists, the chances of us getting all of those queries right is small.
+
+* What we need to do is tell the database manager to aggregate the hours for each scientist separately using a `GROUP BY` clause:
+
+```SQL
+SELECT   person, count(reading), round(avg(reading), 2)
+FROM     Survey
+WHERE    quant = 'rad'
+GROUP BY person;
+```
+
+`GROUP BY` does exactly what its name implies:
+
+* groups all the records with the same value for the specified field together so that aggregation can process each batch separately.
+
+* Since all the records in each batch have the same value for person, it no longer matters that the database manager is picking an arbitrary one to display alongside the aggregated reading values.
+
+* Just as we can sort by multiple criteria at once, we can also group by multiple criteria.
+
+* To get the average reading by scientist and quantity measured, for example, we just add another field to the `GROUP BY` clause:
+```SQL
+SELECT   person, quant, count(reading), round(avg(reading), 2)
+FROM     Survey
+GROUP BY person, quant;
+```
+
+Note that we have added quant to the list of fields displayed, since the results wouldn’t make much sense otherwise.
+
+Let’s go one step further and remove all the entries where we don’t know who took the measurement:
+
+```SQL
+SELECT   person, quant, count(reading), round(avg(reading), 2)
+FROM     Survey
+WHERE    person IS NOT NULL
+GROUP BY person, quant
+ORDER BY person, quant;
 ```
 
 
+Looking more closely, this query:
 
+1. selected records from the Survey table where the person field was not null;
 
+2. grouped those records into subsets so that the person and quant values in each subset were the same;
 
+3. ordered those subsets first by person, and then within each sub-group by quant; and
 
+4. counted the number of records in each subset, calculated the average reading in each, and chose a person and quant value from each (it doesn’t matter which ones, since they’re all equal).
 
+## key points
+* Use `aggregation functions` to combine multiple values.
 
+* Aggregation functions `ignore` null values.
 
+* Aggregation happens after filtering.
 
+* Use `GROUP BY` to combine subsets separately.
 
+* If no aggregation function is specified for a field, the query may return an arbitrary value for that field.

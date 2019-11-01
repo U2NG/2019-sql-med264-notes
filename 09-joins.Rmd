@@ -3,217 +3,135 @@ title: "Table Joins"
 output: html_notebook
 ---
 #### Objectives
-* Understand the structure of a joined table
-* Familiarity with the different join types
-* Use different join types in analysing your data
-* Understand what other join types can tell you about your data
+* Explain the operation of a query that joins two tables.
+
+* Explain how to restrict the output of a query containing a join to only include meaningful combinations of values.
+
+* Write queries that join tables on equal keys.
+
+* Explain what primary and foreign keys are, and why they are useful.
+
+
 
 ## About table joins
-* In any relational database system, the ability to join tables together is a key querying requirement. 
 
-* `Joins` are used to combine the rows from two (or more) tables together to form a single table. 
-* A join between tables will only be possible if they have at least `one column in common`. 
 
-* The column doesn’t have to have the same name in each table, and quite often they won’t, but they do have to have a common usage.
+In order to submit our data to a web site that aggregates historical meteorological data, we might need to format it as latitude, longitude, date, quantity, and reading.
 
-* For example the Question1 table has been created from the information about Q1 in the SN7577 data dictionary file. 
+* However, our latitudes and longitudes are in the `Site` table, while the dates of measurements are in the `Visited` table and the readings themselves are in the `Survey` table.
 
-* There are only two columns The value column indicates a respondents voting intentions and the key column has the value which is used to represent this intention in the SN7577 table.
-* You can see immediately from this that there is a connection or relationship between the the two tables. 
-* The key column in the Question1 table has been defined as a primary key. 
-* This guarantees that the key column has a unique set of values. 
-* Although not required, it is generally the case that the values in one of the columns that the tables have in common will have unique values in it. 
-* It is also not required but generally the case that the unique column will be a primary key in one of the tables.
+We need to combine these tables somehow.
 
-* In the `SN7577` table, the values in the `Q1 column` are the `key values` in the `Q1 table`. 
-* You would not expect these to be unique, many respondents may have the same voting intentions.
+**This figure shows the relations between the tables:**
+http://swcarpentry.github.io/sql-novice-survey/fig/sql-join-structure.svg
 
-* If we wanted to find out the voting intentions of all of the respondents we could write a simple aggregation query like this:
+The SQL command to do this is `JOIN`.
 
-```sql
-SELECT Q1,
-       count(*) as how_many
-FROM SN7577
-GROUP BY Q1;
-```
-![image](images/joins1.png)
+* In any relational database system, the ability to join tables together is a key querying requirement.
 
-## INNER JOIN
+* `Joins` are used to combine the rows from two (or more) tables together to form a single table.
+* A join between tables will only be possible if they have at least `one column in common`.
 
-* What we would really like would be to have the text values of the voting intentions to make the results more readable.
 
-* We can achieve this by joining the Question1 table with the SN7577 table.
-
-* Table names like column names can be given an alias. 
-* This is almost always done when joining tables. 
-* There are two reasons for doing this.
-
-1. In the select clause you can make it clear from which table each of the selected columns comes from by prefixing the column name with the table alias followed by a period. You could use the full table name but by selecting short, single letter alias’ you can save a lot of typing.
-
-2. The column names that you wish to join on may have the same name and so you need some way of distinguishing between them.
-
-Using simple alias’ for the tables our join SQL looks like this:
+To see how it works, let’s start by joining the `Site` and `Visited` tables:
 
 ```sql
-SELECT q.value,
-       count(*) as how_many
-FROM SN7577 s
-JOIN Question1  q
-ON q.key = s.Q1
-GROUP BY  s.Q1
-
+SELECT *
+FROM Site
+JOIN Visited;
 ```
-* Here we have selected the `value` column from the `Question1 table` as this has the text value that we want. 
-* The aggregation remains the same. 
-* The `JOIN clause` names the second table and the `ON clause` gives the criteria by which the tables are to be joined. 
-* The results obtained are:
 
-![image](images/joins2.png)
+`JOIN` creates the cross product of two tables, i.e., it joins each record of one table with each record of the other table to give all possible combinations.
 
+* Since there are three records in Site and eight in Visited, the join’s output has 24 records (3 * 8 = 24) . And since each table has three fields, the output has six fields (3 + 3 = 6).
 
-* The results are the same as before except that the the text of the value column from the Questions1 table has replaced the numeric value from the Q1 column in the SN7577 table.
+What the join hasn’t done is figure out if the records being joined have anything to do with each other.
 
-* Notice that the the `GROUP BY` column does not appear in the `SELECT clause`.
+* It has no way of knowing whether they do or not until we tell it how.
 
-
-## Exercise
+* To do that, we add a clause specifying that we’re only interested in combinations that have the same site name, thus we need to use a filter:
 
 ```sql
-SELECT q.value,
-       count(*) as how_many
-FROM SN7577 s
-JOIN Question1  q
-ON q.key = s.Q1
-GROUP BY  s.Q1
-
+SELECT *
+FROM Site
+JOIN Visited ON Site.name = Visited.site;
 ```
 
-1. Change the SQL so that the group by clause is the value column from the Question1 table. Run the query. How are the results different?
+`ON` is very similar to `WHERE`, and for all the queries in this lesson you can use them interchangeably.
 
-2. Can you change the SQL so that table alias’ are not used? Does this aid readability or not?
+There are differences in how they affect `outer joins`, but that’s beyond the scope of this lesson.
+
+Once we add this to our query, the database manager throws away records that combined information about two different sites, leaving us with just the ones we want.
+
+Notice that we used `Table.field` to specify field names in the output of the join.
+
+We do this because tables can have fields with the same name, and we need to be specific which ones we’re talking about.
+
+* For example, if we joined the `Person` and `Visited` tables, the result would inherit a field called id from each of the original tables.
+
+We can now use the same dotted notation to select the three columns we actually want out of our join:
+
+```SQL
+SELECT Site.lat, Site.long, Visited.dated
+FROM   Site JOIN Visited
+ON     Site.name = Visited.site;
+```
+If joining two tables is good, joining many tables must be better.
+
+In fact, we can join any number of tables simply by adding more `JOIN` clauses to our query, and more `ON` tests to filter out combinations of records that don’t make sense:
+
+```SQL
+SELECT Site.lat, Site.long, Visited.dated, Survey.quant, Survey.reading
+FROM   Site JOIN Visited JOIN Survey
+ON     Site.name = Visited.site
+AND    Visited.id = Survey.taken
+AND    Visited.dated IS NOT NULL;
+```
 
 
-### Solution:
-1. You only have to substitute q.value for `s.Q1` in the `GROUP BY` clause. Essentially the same results are returned but now they are in alphabetical order of the Quustion1 value column text.
+We can tell which records from `Site`, `Visited`, and `Survey` correspond with each other because those tables contain `primary keys` and `foreign keys`.
 
-* Because there are no conflicts in the column names between the two tables you could write the query without using alias’ for the tables. Including the alias’ adds clarity and readability to the SQL, especially if you are selecting several columns from each of the tables.
+* A `primary key` is a value, or combination of values, that uniquely identifies each record in a table.
+
+* A `foreign key` is a value (or combination of values) from one table that identifies a unique record in another table.
+  * Another way of saying this is that a `foreign key` is the `primary key` of one table that appears in some other table.
+  * In our database, `Person.id` is the `primary key` in the `Person table`, while `Survey.person` is a `foreign key` relating the `Survey` table’s entries to entries in `Person`.
 
 
-## Different join types
+Most database designers believe that every table should have a `well-defined primary key`.
 
-The example of a join given above is called an `INNER join`, ** we could have written **INNER JOIN ** rathere than simply **JOIN. 
-* This is almost never done in practice as the inner join is by far the most common join type used.
+They also believe that this key should be separate from the data itself, so that if we ever need to change the data, we only need to make one change in one place.
 
-* Other Join types are available…
+One easy way to do this is to create an arbitrary, unique ID for each record as we add it to the database.
 
-* Before we look at the other `join type`s we need to explain how the `Inner join` works and why it is so commonly used.
+This is actually very common: those IDs have names like “student numbers” and “patient numbers”, and they almost always turn out to have originally been a `unique record identifier` in some database system or other.
 
-* To illustrate this for all joins we are defining a relationship between two tables based on the data values in two columns, one from each table. 
-
-* What that relationship is, is given by the criteria in the `ON clause`. 
-* The value of the column in one table must be same as that in the other table.
-
-* The table specified in the `FROM clause` is usally the table with the `unique keys` and we want to join it with the table in the `JOIN clause` which has a column which contain the key values, but aren’t necessarily unique. 
-* Quite often they are not expected to be unique. They are expected to exist though.
-
-* When a relational database is defined and the tables set up initially the relationship between the tables are already known, they are part of the design of the overall database.
-
-* Because of this it is possible to ensure when the data is added to the tables that there will be entries in both tables which have matching values. 
-* At the very least you can prevent rows being added to the second table with a value in the column you intend to join on for which there is no matching column in the first table.
-
-* An `inner join` only returns rows where there is a `match` between the two columns. 
-* In most cases this will be all of the columns selected from the first table and 0,1 or more columns selected from the second table.
-
-* The relational design makes use of multiple tables as a way of avoiding repetition of data. 
-* **Joining tables re-introduces the replication of the data**
-
-## There are severeal different join types possible
-
-![image](images/jointypes.png)
-
-In SQLite only the `Inner join`, the `Left Outer join` and the `Cross join` are supported. 
-* You can create a `Right outer join` by swapping the tables in the `From` and `Join` clauses. 
-* A `Full outer join` is the combination of the `Left outer and Right outer joins`.
-
-## Using different join types in analysing your data
-
-* In many cases the data you have in your tables may have come from disperate sources, in that they do not form part of a planned relational database. 
-* It has been your decision to bring together (join) the data in the tables.
-
-* In order to do this at all you must be confident that the tables of data do have columns which have a common set of values that you can join on.
-
-* Assuming you do have a common column to join on, you can use an `Inner join` to combine the data.
-
-* However it will also be important for you to establish rows in both of the tables for which there is no matching row in the other table.
-
-    * You may expect some to be missing
-    * You may not care that some are missing
-    * You may need to explain why some are missing
-
-* To do this you will want to use a `Full outer join` or in the case of SQLite a `Left outer join` run twice using both tables in the `From` and `Join` clauses.
-
-* To illustrate the different join types we will use two small example tables
-
-![image](images/joinexample1.png)
-* These tables have been included in the SN7577 database
-
-![image](images/innerjoin.png)
-![image](images/leftouterjoin.png)
-![image](images/leftouterjoinreversed.png)
-
-* In the two Outer queries DBBrowser shows the NULL values as red cells.
-
-### Exercise
-1. Modify the first `Left Outer Join` query above so that only the joined rows where there is no match in the Animals_Eat table are returned.
+As the query below demonstrates, SQLite automatically numbers records as they’re added to tables, and we can use those record numbers in queries:
 
 ```sql
-SELECT a.*, e.*
-FROM Animals as a
-LEFT OUTER JOIN Animals_Eat as e
-on a.ID_A = e.ID_E
+SELECT rowid, *
+FROM Person;
+
 ```
 
-2. Modify the second `Left Outer Join` query above so that only the the `Id_E column` from the `Animals_Eat table` is returned where there is no matching row in the Animal table.
-
-```sql
-SELECT a.*, e.*
-FROM Animals_Eat as a
-LEFT OUTER JOIN Animals as a
-on a.ID_A = e.ID_E
-```
-
-####Solution:
-```sql
-SELECT a.* , e.*
-FROM Animals  as a
-Left outer Join  Animals_Eat as e
-on  a.Id_A = e.Id_E
-where e.Id_e is NULL;
-```
-
-```sql
-SELECT Id_E
-FROM Animals_Eat
-Left outer Join Animals
-ON  Id_A = Id_E
-WHERE Id_A is NULL
-ORDER by Id_E;
-```
-Because there is no conflict in the column names across the two tables, we have chosen not to use alias’. Notice that the Id_A column which we are checking for NULL doesn’t have to be a returned column.
+A good visual explanation of joins can be found here https://sql-joins.leopard.in.ua/
 
 
+## Key pointsUse JOIN to combine data from two tables.
 
-#### key points
+* Use `table.field` notation to refer to fields when doing joins.
 
-* Joins are used to combine data from two or more tables.
+* Every fact should be represented in a database exactly once.
 
-* Tables to be joined must have a column in each which represent the same thing
+* A join produces all combinations of records from one table with records from another.
 
-* There are several different types of joins
+* A `primary key` is a field (or set of fields) whose values uniquely identify the records in a table.
 
-* The Inner join is the most commonly use
+* A `foreign key` is a field (or set of fields) in one table whose values are a primary key in another table.
 
-* You may have to use the other join types to discover missing data or gaps in your data
+* We can eliminate meaningless combinations of records by matching primary keys and foreign keys between tables.
+
+* The most common join condition is `matching keys`.
 
 
 
@@ -221,8 +139,4 @@ Because there is no conflict in the column names across the two tables, we have 
 
 
 
-
-
-
-
-
+---
