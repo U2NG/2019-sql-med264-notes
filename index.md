@@ -8,7 +8,7 @@ SQL for MED264 lecture notes
 3. [02-Using-DBBrowser](02-Using-DBBrowser.html)
       * [02-Using-DBBrowser-Info](02-db-browser-info.html)
 4. [03-select and filter](03-selectandfilter.html)
-5. [04-missing-data](04-missing-data.nb.html)
+5. [04-missing-data](04-missing-data.html)
 6. [05-new-columns](05-new-columns.nb.html) - skip
 7. [06-aggregation](06-aggregation.html)
 8. [07-creating-tables](07-creating-tables.nb.html) - skip
