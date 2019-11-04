@@ -5,98 +5,113 @@ output: html_notebook
 
 ## How does the database represents missing data
 
-*  A noted earlier, all database system have the concept of a `NULL` value; Something which is missing and nothing is known about it.
+Real-world data is never complete — there are always holes.
+ Databases represent these holes using a special value called `null`.
+ * null is not zero, False, or the empty string;
+ * it is a one-of-a-kind value that means “nothing here”.
+ * Dealing with null requires a few special tricks and some careful thinking.
 
-* In DB Browser we can choose how we want `NULLs` in a table to be displayed. 
+To start, let’s have a look at the Visited table.
+* There are eight records, but #752 doesn’t have a date — or rather, its date is `null`:
 
-* When we had our initial look at DB Browser, we used the `View | Preference` option to change the background colour of cells in a table which has a `NULL` values as red. 
-
-* The example below is a version of the SN7577 table with most of the columns removed and some NULL values introduced in the `numage` column.
-
-![image 1](images/SQL_04_Nulls_01.png)
-
-* If you type `=NULL` in the filter box for `numage`, only the rows with `NULL` in `numage` will be displayed.
-* You can get the same results using the following query:
-
-```sql
-SELECT * from 
-    SN7577_nulls
-WHERE numage is NULL;
-```
-* This table was created from a `csv` file which looks like this
-
-![image2](images/SQL_04_Nulls_02.png)
-
-* The line numbers on the left are from the text editor and are not part of the data.
-* You can see that in `lines 4, 9 and 15` there are consequetive `, ,`s where the numage values should be. These values are missing from the data.
-
-### Other representations of missing data
-
-* The `SN7577_nulls` table was specially created to demonstrate how NULLs appear in DB Browser. 
-* The proper `SN7577` table does not contain any missing values in the sense of having consequetive `,,`s. 
-
-* This is because the SN7577 data is provided by the `UKDS (UK Data Service)` whose role in part is to clean datasets before making them publicly available.
-
-* However the data provided to them, could well have missing data. 
-* In the case of the `SN7577` dataset this is typically dealt with by substituting the missing value with a value of `-1`.  
-
-* This is explained in the provided `data dictionary` for the `SN7577` dataset. 
-
-* An extract for `Q2` is shown below.
-
-![image](images/SQL_04_Nulls_03.png)
-
-* You can see from the extract of the `SN7577_nulls` file above that there are several `-1` values in the `Q2` field indicating the original data had no value, therefore interpreted as a `NULL` value for specific rows in `Q2`.
-
-* This is very different from rows which have a value of `11` for column `Q2` (3rd row from bottom). 
-
-* The `value 11` means that the participant `refused` to provide an answer. 
-* The refusal may not tell you which party they are inclined to vote for, but it does convey some kind of information. 
-* **A `NULL` value tells you nothing.**
-
-* Different statistical packages like `SPSS` or `Stata` have their own way of representing `NULL values` such as `-99` or `-999`. 
-* You need to be aware of how NULL values in your dataset are being represented.
-
-
-### Dealing with missing data
-
-* Once you know how `NULL` values are being represented in your data you can find them and allow for them in your SQL queries.
-
-```sql
-SELECT *
-FROM SN7577_nulls
-WHERE Q2 = 11;
-
-```
-
-* returns 39 rows
-
-```sql
-SELECT *
-FROM SN7577_nulls
-WHERE Q2 = -1;
-```
-
-* returns 898 rows, nearly 70% of the sample. 
-* You would have to decide if the reaming 30% was sufficient for you to use in meaningful analysis.
-
-* If you need to test for actual `NULL` values in the data, you use the `IS` operator and the `NULL` keyword
-
-```sql
-SELECT *
-FROM SN7577_nulls
-WHERE numage IS NULL;
-```
-
-* If you wish to `omit` rows with NULLs then include the `NOT` operator.
 
 
 ```sql
 SELECT *
-FROM SN7577_nulls
-WHERE numage IS NOT NULL;
+FROM Visited;
+```
+* Null doesn’t behave like other values. If we select the records that come before 1930:
 
+```SQL
+SELECT *
+FROM Visited
+WHERE dated < '1930-01-01'
+```
+we get two results, and if we select the ones that come during or after 1930:
+
+```SQL
+SELECT *
+FROM Visited
+WHERE dated >= '1930-01-01';
+```
+we get five, but record #752 isn’t in either set of results.
+
+The reason is that `null<'1930-01-01'` is neither true nor false: null means, “We don’t know,” and if we don’t know the value on the left side of a comparison, we don’t know whether the comparison is true or false. Since databases represent “don’t know” as null, the value of `null<'1930-01-01'` is actually null.
+
+ `null>='1930-01-01'` is also null because we can’t answer to that question either. And since the only records kept by a `WHERE` are those for which the test is true, record #752 isn’t included in either set of results.
+
+Comparisons aren’t the only operations that behave this way with nulls.
+
+`1+null is null, 5*null is null, log(null) is null`, and so on.
+
+In particular, comparing things to null with `=` and `!=` produces null:
+
+```SQL
+SELECT *
+FROM Visited
+WHERE dated = NULL;
 ```
 
+produces no output, and neither does:
+
+```SQL
+SELECT *
+FROM Visited
+WHERE dated != NULL;
+```
+
+To check whether a value is `null` or not, we must use a special test `IS NULL`:
+
+or its inverse `IS NOT NULL`:
+
+```SQL
+SELECT *
+FROM Visited
+WHERE dated IS NOT NULL;
+```
+
+`Null` values can cause headaches wherever they appear.
+
+* For example, suppose we want to find all the salinity measurements that weren’t taken by Lake.
+
+It’s natural to write the query like this:
+
+```SQL
+SELECT *
+FROM Survey
+WHERE quant = 'sal' AND person != 'lake';
+
+```
+but this query filters omits the records where we don’t know who took the measurement.
+
+Once again, the reason is that when person is `null`, `the !=` comparison produces `null`, so the record isn’t kept in our results. If we want to keep these records we need to add an explicit check:
+
+```SQL
+SELECT *
+ROM Survey
+WHERE quant = 'sal' AND (person != 'lake' OR person IS NULL);
+```
+
+We still have to decide whether this is the right thing to do or not.
+
+If we want to be absolutely sure that we aren’t including any measurements by Lake in our results, we need to exclude all the records for which we don’t know who did the work.
+
+In contrast to arithmetic or Boolean operators, aggregation functions that combine multiple values, such as `min, max or avg`, ignore `null` values.
+
+In the majority of cases, this is a desirable output: for example, unknown values are thus not affecting our data when we are averaging it.
+
+Aggregation functions will be addressed in more detail in the next section.
 
 
+
+## Key Points
+* Databases use a special value called `NULL` to represent missing information.
+
+* Almost all operations on `NULL` produce `NULL`.
+
+* Queries can test for `NULLs` using `IS NULL` and `IS NOT NULL`.
+
+
+
+
+---
