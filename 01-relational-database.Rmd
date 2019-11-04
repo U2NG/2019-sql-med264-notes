@@ -8,7 +8,7 @@ output: html_notebook
 
 * Relationships can be defined between the data in one table and the data in another or many other tables.
 
-* The relational database system will provide mechanisms by which you can query the data in the tables, re-assemble the data in various ways without altering the data in the actual tables. 
+* The relational database system will provide mechanisms by which you can query the data in the tables, re-assemble the data in various ways without altering the data in the actual tables.
 
 * This querying is usually done using SQL (Structured Query Language). This is a relatively straight forward language to learn, certainly for simple queries.
 
@@ -34,7 +34,7 @@ It has rows and it has columns.
 * Typical examples will be `Integer or Text`.
 * In SQLite there is quite a number of possible data type.
 
-[**Show most used data type table from notes**](https://data-lessons.github.io/sql-socialsci/01-relational-database/)
+[**Show most used data type table from DC SQL notes**](https://datacarpentry.org/sql-ecology-lesson/00-sql-introduction/index.html
 
 # Why do tables have key columns?
 
