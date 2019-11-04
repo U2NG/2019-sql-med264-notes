@@ -2,7 +2,7 @@
       <html>
         <head>
             <meta charset="utf-8" />
-            <title>index</title>
+            <title>04-missing-data</title>
             <style>.markdown-preview:not([data-use-github-style]) { padding: 2em; font-size: 1.2em; color: rgb(171, 178, 191); background-color: rgb(40, 44, 52); overflow: auto; }
 .markdown-preview:not([data-use-github-style]) > :first-child { margin-top: 0px; }
 .markdown-preview:not([data-use-github-style]) h1, .markdown-preview:not([data-use-github-style]) h2, .markdown-preview:not([data-use-github-style]) h3, .markdown-preview:not([data-use-github-style]) h4, .markdown-preview:not([data-use-github-style]) h5, .markdown-preview:not([data-use-github-style]) h6 { line-height: 1.2; margin-top: 1.5em; margin-bottom: 0.5em; color: rgb(255, 255, 255); }
@@ -582,26 +582,71 @@ pre.editor-colors .fold-marker:after {
 }
 </style>
         </head>
-        <body class='markdown-preview' data-use-github-style><h1 id="2019-sql-med264-notes">2019-sql-MED264-notes</h1>
-<p>SQL for MED264 lecture notes</p>
-<h3 id="lesson-notes">Lesson Notes:</h3>
-<ol>
-<li><a href="00-setup.nb.html">Setup</a></li>
-<li><a href="01-relational-database.html">01-relational-database</a></li>
-<li><a href="02-Using-DBBrowser.html">02-Using-DBBrowser</a><ul>
-<li><a href="02-db-browser-info.html">02-Using-DBBrowser-Info</a></li>
+        <body class='markdown-preview' data-use-github-style><table>
+<thead>
+<tr>
+<th>title</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SQL Missing Data</td>
+<td>html_notebook</td>
+</tr>
+</tbody></table>
+<h2 id="how-does-the-database-represents-missing-data">How does the database represents missing data</h2>
+<p>Real-world data is never complete — there are always holes.
+ Databases represent these holes using a special value called <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code>.</p>
+<ul>
+<li>null is not zero, False, or the empty string;</li>
+<li>it is a one-of-a-kind value that means “nothing here”.</li>
+<li>Dealing with null requires a few special tricks and some careful thinking.</li>
 </ul>
+<p>To start, let’s have a look at the Visited table.</p>
+<ul>
+<li>There are eight records, but #752 doesn’t have a date — or rather, its date is <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code>:</li>
+</ul>
+<pre class="editor-colors lang-sql"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited<span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<ul>
+<li>Null doesn’t behave like other values. If we select the records that come before 1930:</li>
+</ul>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> dated <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">&lt;</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>1930-01-01<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span></span></div></pre>
+<p>we get two results, and if we select the ones that come during or after 1930:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> dated <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">&gt;=</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>1930-01-01<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p>we get five, but record #752 isn’t in either set of results.</p>
+<p>The reason is that <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null&lt;'1930-01-01'</code> is neither true nor false: null means, “We don’t know,” and if we don’t know the value on the left side of a comparison, we don’t know whether the comparison is true or false. Since databases represent “don’t know” as null, the value of <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null&lt;'1930-01-01'</code> is actually null.</p>
+<p> <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null&gt;='1930-01-01'</code> is also null because we can’t answer to that question either. And since the only records kept by a <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">WHERE</code> are those for which the test is true, record #752 isn’t included in either set of results.</p>
+<p>Comparisons aren’t the only operations that behave this way with nulls.</p>
+<p><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">1+null is null, 5*null is null, log(null) is null</code>, and so on.</p>
+<p>In particular, comparing things to null with <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">=</code> and <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">!=</code> produces null:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> dated <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">=</span> <span class="syntax--keyword syntax--other syntax--DDL syntax--create syntax--II syntax--sql">NULL</span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p>produces no output, and neither does:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> dated <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">!=</span> <span class="syntax--keyword syntax--other syntax--DDL syntax--create syntax--II syntax--sql">NULL</span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p>To check whether a value is <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code> or not, we must use a special test <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">IS NULL</code>:</p>
+<p>or its inverse <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">IS NOT NULL</code>:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Visited</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> dated <span class="syntax--keyword syntax--other syntax--DDL syntax--create syntax--II syntax--sql">IS NOT NULL</span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p><code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">Null</code> values can cause headaches wherever they appear.</p>
+<ul>
+<li>For example, suppose we want to find all the salinity measurements that weren’t taken by Lake.</li>
+</ul>
+<p>It’s natural to write the query like this:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">FROM</span> Survey</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> quant <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">=</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>sal<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span> <span class="syntax--keyword syntax--other syntax--DML syntax--sql">AND</span> person <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">!=</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>lake<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p>but this query filters omits the records where we don’t know who took the measurement.</p>
+<p>Once again, the reason is that when person is <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code>, <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">the !=</code> comparison produces <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code>, so the record isn’t kept in our results. If we want to keep these records we need to add an explicit check:</p>
+<pre class="editor-colors lang-SQL"><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">SELECT</span> <span class="syntax--keyword syntax--operator syntax--star syntax--sql">*</span></span></div><div class="line"><span class="syntax--source syntax--sql">ROM Survey</span></div><div class="line"><span class="syntax--source syntax--sql"><span class="syntax--keyword syntax--other syntax--DML syntax--sql">WHERE</span> quant <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">=</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>sal<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span> <span class="syntax--keyword syntax--other syntax--DML syntax--sql">AND</span> <span class="syntax--punctuation syntax--definition syntax--section syntax--bracket syntax--round syntax--begin syntax--sql">(</span>person <span class="syntax--keyword syntax--operator syntax--comparison syntax--sql">!=</span> <span class="syntax--string syntax--quoted syntax--single syntax--sql"><span class="syntax--punctuation syntax--definition syntax--string syntax--begin syntax--sql">'</span>lake<span class="syntax--punctuation syntax--definition syntax--string syntax--end syntax--sql">'</span></span> <span class="syntax--keyword syntax--other syntax--DML syntax--sql">OR</span> person <span class="syntax--keyword syntax--other syntax--DDL syntax--create syntax--II syntax--sql">IS NULL</span><span class="syntax--punctuation syntax--definition syntax--section syntax--bracket syntax--round syntax--end syntax--sql">)</span><span class="syntax--punctuation syntax--terminator syntax--statement syntax--semicolon syntax--sql">;</span></span></div></pre>
+<p>We still have to decide whether this is the right thing to do or not.</p>
+<p>If we want to be absolutely sure that we aren’t including any measurements by Lake in our results, we need to exclude all the records for which we don’t know who did the work.</p>
+<p>In contrast to arithmetic or Boolean operators, aggregation functions that combine multiple values, such as <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">min, max or avg</code>, ignore <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">null</code> values.</p>
+<p>In the majority of cases, this is a desirable output: for example, unknown values are thus not affecting our data when we are averaging it.</p>
+<p>Aggregation functions will be addressed in more detail in the next section.</p>
+<h2 id="key-points">Key Points</h2>
+<ul>
+<li><p>Databases use a special value called <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULL</code> to represent missing information.</p>
 </li>
-<li><a href="03-selectandfilter.html">03-select and filter</a></li>
-<li><a href="04-missing-data.nb.html">04-missing-data</a></li>
-<li><a href="05-new-columns.nb.html">05-new-columns</a> - skip</li>
-<li><a href="06-aggregation.html">06-aggregation</a></li>
-<li><a href="07-creating-tables.nb.html">07-creating-tables</a> - skip</li>
-<li><a href="08-commandline.nb.html">08-commandline</a> - skip</li>
-<li><a href="09-joins.html">09-joins</a></li>
-</ol>
-<h3 id="data-download">Data Download</h3>
-<ol>
-<li><a href="http://swcarpentry.github.io/sql-novice-survey/files/survey.db">survey.db sqlite database</a></li>
-</ol></body>
+<li><p>Almost all operations on <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULL</code> produce <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULL</code>.</p>
+</li>
+<li><p>Queries can test for <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">NULLs</code> using <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">IS NULL</code> and <code style="font-family: Menlo, Consolas, &quot;DejaVu Sans Mono&quot;, monospace;">IS NOT NULL</code>.</p>
+</li>
+</ul>
+<hr></body>
       </html>
