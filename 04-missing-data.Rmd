@@ -34,13 +34,13 @@ SELECT *
 FROM Visited
 WHERE dated >= '1930-01-01';
 ```
-we get five, but record #752 isn’t in either set of results.
+* we get five, but record #752 isn’t in either set of results.
 
-The reason is that `null<'1930-01-01'` is neither true nor false: null means, “We don’t know,” and if we don’t know the value on the left side of a comparison, we don’t know whether the comparison is true or false. Since databases represent “don’t know” as null, the value of `null<'1930-01-01'` is actually null.
+The reason is that `null<'1930-01-01'` is neither true nor false: `null` means, “We don’t know,” and if we don’t know the value on the left side of a comparison, we don’t know whether the comparison is true or false. Since databases represent “don’t know” as null, the value of `null<'1930-01-01'` is actually null.
 
  `null>='1930-01-01'` is also null because we can’t answer to that question either. And since the only records kept by a `WHERE` are those for which the test is true, record #752 isn’t included in either set of results.
 
-Comparisons aren’t the only operations that behave this way with nulls.
+* Comparisons aren’t the only operations that behave this way with nulls.
 
 `1+null is null, 5*null is null, log(null) is null`, and so on.
 
@@ -51,8 +51,7 @@ SELECT *
 FROM Visited
 WHERE dated = NULL;
 ```
-
-produces no output, and neither does:
+* produces no output, and neither does:
 
 ```SQL
 SELECT *
@@ -62,7 +61,13 @@ WHERE dated != NULL;
 
 To check whether a value is `null` or not, we must use a special test `IS NULL`:
 
-or its inverse `IS NOT NULL`:
+```SQL
+SELECT *
+FROM Visited
+WHERE dated IS NULL;
+```
+
+* or its inverse `IS NOT NULL`:
 
 ```SQL
 SELECT *
@@ -82,13 +87,15 @@ FROM Survey
 WHERE quant = 'sal' AND person != 'lake';
 
 ```
-but this query filters omits the records where we don’t know who took the measurement.
+* but this query filters omits the records where we don’t know who took the measurement.
 
-Once again, the reason is that when person is `null`, `the !=` comparison produces `null`, so the record isn’t kept in our results. If we want to keep these records we need to add an explicit check:
+Once again, the reason is that when person is `null`, `the !=` comparison produces `null`, so the record isn’t kept in our results.
+
+If we want to keep these records we need to add an explicit check:
 
 ```SQL
 SELECT *
-ROM Survey
+FROM Survey
 WHERE quant = 'sal' AND (person != 'lake' OR person IS NULL);
 ```
 
